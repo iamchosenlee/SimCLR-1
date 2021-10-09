@@ -11,7 +11,11 @@ class ContrastiveLearningDataset:
 
     @staticmethod
     def get_simclr_pipeline_transform(size, s=1):
-        """Return a set of data augmentation transformations as described in the SimCLR paper."""
+        """Return a set of data augmentation transformations as described in the SimCLR paper.
+           It is crucial in defining the contrastive prediction tasks that yield effective representations.
+           sequentially apply three simple augmentations: 
+           random cropping followed by resize back to the original size, random color distortions, and random Gaussian blur."""
+
         color_jitter = transforms.ColorJitter(0.8 * s, 0.8 * s, 0.8 * s, 0.2 * s)
         data_transforms = transforms.Compose([transforms.RandomResizedCrop(size=size),
                                               transforms.RandomHorizontalFlip(),
@@ -21,7 +25,9 @@ class ContrastiveLearningDataset:
                                               transforms.ToTensor()])
         return data_transforms
 
-    def get_dataset(self, name, n_views):
+    def get_dataset(self, name, n_views):i
+        """ The paper use ImageNet ILSVRC-2012 dataset for unsupervised pretraining."""
+
         valid_datasets = {'cifar10': lambda: datasets.CIFAR10(self.root_folder, train=True,
                                                               transform=ContrastiveLearningViewGenerator(
                                                                   self.get_simclr_pipeline_transform(32),

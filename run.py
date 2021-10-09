@@ -5,6 +5,7 @@ from torchvision import models
 from data_aug.contrastive_learning_dataset import ContrastiveLearningDataset
 from models.resnet_simclr import ResNetSimCLR
 from simclr import SimCLR
+from torchlars import LARS
 
 model_names = sorted(name for name in models.__dict__
                      if name.islower() and not name.startswith("__")
@@ -74,10 +75,16 @@ def main():
 
     model = ResNetSimCLR(base_model=args.arch, out_dim=args.out_dim)
 
-    optimizer = torch.optim.Adam(model.parameters(), args.lr, weight_decay=args.weight_decay)
+   #  optimizer = torch.optim.Adam(model.parameters(), args.lr, weight_decay=args.weight_decay)
 
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=len(train_loader), eta_min=0,
-                                                           last_epoch=-1)
+    # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=len(train_loader), eta_min=0,
+                                                           # last_epoch=-1)
+### LARS optimizer  
+# To overcome the optimization difficulties of large batch training, **Layer-wise Adaptive Rate Scaling(LARS)** was used.  
+# * LARS uses a separate learning rate for each layer and not for each weight, which leads to better stability.
+# * The magnitude of the update is controlled with respect to the weight norm for better control of training speed.     
+    base_optimizer = optim.SGD(model.parameters(), lr=0.1)
+    optimizer = LARS(optimizer=base_optimizer, eps=1e-8, trust_coef=0.001) 
 
     #  It’s a no-op if the 'gpu_index' argument is a negative integer or None.
     with torch.cuda.device(args.gpu_index):
