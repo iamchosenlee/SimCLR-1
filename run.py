@@ -77,13 +77,13 @@ def main():
 
    #  optimizer = torch.optim.Adam(model.parameters(), args.lr, weight_decay=args.weight_decay)
 
-    # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=len(train_loader), eta_min=0,
+     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=len(train_loader), eta_min=0,
                                                            # last_epoch=-1)
 ### LARS optimizer  
 # To overcome the optimization difficulties of large batch training, **Layer-wise Adaptive Rate Scaling(LARS)** was used.  
 # * LARS uses a separate learning rate for each layer and not for each weight, which leads to better stability.
 # * The magnitude of the update is controlled with respect to the weight norm for better control of training speed.     
-    base_optimizer = optim.SGD(model.parameters(), lr=0.1)
+    base_optimizer = torch.optim.Adam(model.parameters(), args.lr, weight_decay=args.weight_decay)
     optimizer = LARS(optimizer=base_optimizer, eps=1e-8, trust_coef=0.001) 
 
     #  It’s a no-op if the 'gpu_index' argument is a negative integer or None.
