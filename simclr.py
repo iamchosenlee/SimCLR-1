@@ -74,6 +74,7 @@ class SimCLR(object):
                 with autocast(enabled=self.args.fp16_precision):
                     features = self.model(images)
                     logits, labels = self.info_nce_loss(features)
+                    #self.criterion is torch.nn.CrossEntropyLoss()
                     loss = self.criterion(logits, labels)
 
                 self.optimizer.zero_grad()
